@@ -1,0 +1,13 @@
+from django.shortcuts import render
+
+from .models import Product
+
+def product_list(request):
+    products = Product.objects.all()
+    return render(request, 'main/list.html', {'products': products})
+
+def product_detail(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    return render(request, 'main/detail.html', {'product': product})
+def index(request):
+    return render(request, 'main/index.html')
