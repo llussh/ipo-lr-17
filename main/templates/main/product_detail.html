@@ -1,21 +1,263 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>{{ product.name }}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} — Детали товара</title>
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #fdfbf7;
+            color: #4a3f35;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            overflow-x: hidden;
+        }
+        /* Контейнер для летающих котиков */
+        #cat-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .floating-cat {
+            position: absolute;
+            font-size: 24px;
+            user-select: none;
+            animation: fall linear infinite;
+            opacity: 0.6;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Навигация */
+        nav {
+            background-color: #f4efe6;
+            padding: 15px 0;
+            border-bottom: 1px solid #e9dfce;
+            position: relative;
+            z-index: 10;
+        }
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+        }
+        nav a {
+            color: #6b5b4b;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 1. Хлебные крошки (Breadcrumbs) */
+        .breadcrumbs {
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            color: #8c7b6c;
+        }
+        .breadcrumbs a {
+            color: #8c6d53;
+            text-decoration: none;
+        }
+        .breadcrumbs a:hover {
+            text-decoration: underline;
+        }
+
+        /* 2. Основной блок (две колонки) */
+        .product-container {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        /* Левая колонка (Фото) */
+        .product-gallery {
+            flex: 1 1 400px;
+        }
+        .product-main-img {
+            width: 100%;
+            max-height: 450px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid #efeae0;
+            background-color: #fff;
+        }
+        .no-img-placeholder {
+            width: 100%;
+            height: 350px;
+            background-color: #f4efe6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            color: #8c7b6c;
+        }
+
+        /* Правая колонка (Инфо) */
+        .product-info {
+            flex: 1 1 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .product-info h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: #3d3126;
+        }
+        .manufacturer-badge {
+            color: #8c6d53;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .product-description {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #6b5b4b;
+            margin: 10px 0;
+        }
+        .product-price {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #8c6d53;
+        }
+        .stock-status {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Кнопка добавления в корзину */
+        .btn-cart {
+            background-color: #8c6d53;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            width: fit-content;
+        }
+        .btn-cart:hover {
+            background-color: #735943;
+        }
+        /* 3. Кнопка если товара нет в наличии */
+        .btn-cart:disabled {
+            background-color: #dcd6cd;
+            color: #a89f91;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
-    <h1>{{ product.name }}</h1>
-    {% if product.photo %}
-        <img src="{{ product.photo.url }}" alt="{{ product.name }}" style="max-width: 300px;">
-    {% endif %}
-    <p><strong>Описание:</strong> {{ product.description }}</p>
-    <p><strong>Цена:</strong> {{ product.price }} руб.</p>
-    <p><strong>Остаток на складе:</strong> {{ product.stock }} шт.</p>
-    <p><strong>Категория:</strong> {{ product.category.name }}</p>
-    <p><strong>Производитель:</strong> {{ product.manufacturer.name }}</p>
 
-    <a href="{% url 'catalog:add_to_cart' product.id %}" style="background: green; color: white; padding: 10px; text-decoration: none;">Добавить в корзину</a>
-    <br><br>
-    <a href="{% url 'catalog:product_list' %}">Назад в каталог</a>
+    <div id="cat-container"></div>
+
+    <nav>
+        <ul>
+            <li><a href="{% url 'catalog:index' %}">Главная</a></li>
+            <li><a href="{% url 'catalog:product_list' %}">Каталог</a></li>
+            <li><a href="/admin/">Админ-панель</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- 1. ХЛЕБНЫЕ КРОШКИ -->
+        <div class="breadcrumbs">
+            <a href="{% url 'catalog:index' %}">Главная</a> — 
+            <a href="{% url 'catalog:product_list' %}">Каталог</a> — 
+            <span>{{ product.name }}</span>
+        </div>
+
+        <!-- 2. ОСНОВНОЙ БЛОК -->
+        <div class="product-container">
+            <!-- Левая колонка: Фото товара -->
+            <div class="product-gallery">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-main-img">
+                {% else %}
+                    <div class="no-img-placeholder">Фотография отсутствует</div>
+                {% endif %}
+            </div>
+
+            <!-- Правая колонка: Информация -->
+            <div class="product-info">
+                <h1>{{ product.name }}</h1>
+                
+                {% if product.manufacturer %}
+                    <div class="manufacturer-badge">Производитель: {{ product.manufacturer.name }}</div>
+                {% endif %}
+                
+                <div class="product-price">{{ product.price }} руб.</div>
+                
+                <!-- Статус склада -->
+                <div class="stock-status">
+                    {% if product.stock > 0 %}
+                        <span style="color: #4e8c53;">✔ В наличии (осталось: {{ product.stock }} шт.)</span>
+                    {% else %}
+                        <span style="color: #c45a4a;">✖ Нет в наличии</span>
+                    {% endif %}
+                </div>
+
+                <div class="product-description">
+                    <strong>Описание:</strong><br>
+                    {{ product.description|default:"Описание товара временно отсутствует." }}
+                </div>
+
+                <!-- Форма добавления в корзину с проверкой (disabled) -->
+                <form action="{% url 'catalog:add_to_cart' product.id %}" method="post">
+                    {% csrf_token %}
+                    {% if product.stock > 0 %}
+                        <button type="submit" class="btn-cart">Добавить в корзину</button>
+                    {% else %}
+                        <button type="button" class="btn-cart" disabled>Нет в наличии</button>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        const catContainer = document.getElementById('cat-container');
+        const catEmojis = ['🐱', '🐈', '🐾', '😸', '😻', '🐈‍⬛'];
+        function createCat() {
+            const cat = document.createElement('div');
+            cat.classList.add('floating-cat');
+            cat.innerText = catEmojis[Math.floor(Math.random() * catEmojis.length)];
+            cat.style.left = Math.random() * 100 + 'vw';
+            const duration = Math.random() * 4 + 5;
+            cat.style.animationDuration = duration + 's';
+            cat.style.fontSize = Math.random() * 12 + 20 + 'px';
+            catContainer.appendChild(cat);
+            setTimeout(() => { cat.remove(); }, duration * 1000);
+        }
+        setInterval(createCat, 700);
+    </script>
 </body>
 </html>

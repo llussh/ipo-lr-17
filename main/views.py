@@ -17,9 +17,17 @@ from .serializers import (
     ElemCartSerializer
 )
 from rest_framework import viewsets
+from django.core.paginator import Paginator
 
 def index(request):
-    return render(request, 'main/index.html')
+    popular_products = Product.objects.all().order_by('-id')[:6]
+    categories = Category.objects.all()
+    
+    context = {
+        'popular_products': popular_products,
+        'categories': categories,
+    }
+    return render(request, 'main/index.html', context)
 
 def product_list(request):
     query = request.GET.get('q', '')
@@ -34,8 +42,20 @@ def product_list(request):
         products = products.filter(category_id=category_id)
     if manufacturer_id:
         products = products.filter(manufacturer_id=manufacturer_id)
-        
-    return render(request, 'main/product_list.html', {'products': products, 'query': query})
+    paginator = Paginator(products, 9)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    categories = Category.objects.all()
+    manufacturers = Manufacturer.objects.all()
+    context = {
+        'page_obj': page_obj,        
+        'categories': categories,
+        'manufacturers': manufacturers,
+        'current_query': query,
+        'current_category': category_id,
+        'current_manufacturer': manufacturer_id,
+    }
+    return render(request, 'main/list.html',context,)
 
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)

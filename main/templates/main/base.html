@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Магазин{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <strong>Интернет-магазин</strong> | 
+        <a href="{% url 'catalog:index' %}">Главная</a> | 
+        <a href="{% url 'catalog:product_list' %}">Каталог</a> | 
+        <a href="{% url 'catalog:cart_view' %}">Корзина</a>
+        
+        <hr>
+        <div>
+            {% if user.is_authenticated %}
+                <span>Пользователь: {{ user.username }}</span>
+                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Выйти</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}">Войти</a>
+            {% endif %}
+        </div>
+        <hr>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <hr>
+        <p>&copy; 2026 Мой Магазин. Все права защищены.</p>
+    </footer>
+
+    {% block scripts %}
+    {% endblock %}
+
+</body>
+</html>
