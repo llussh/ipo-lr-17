@@ -1,0 +1,22 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+<h2>Оформление заказа</h2>
+
+<h3>Ваши товары:</h3>
+{% for item in cart_items %}
+    <p>{{ item.product.name }} x {{ item.quantity }} = {% widthratio item.product.price 1 item.quantity %} руб.</p>
+{% endfor %}
+<p><strong>Итого: {{ total }} руб.</strong></p>
+
+<form method="post">
+    {% csrf_token %}
+    <p>Адрес доставки:</p>
+    <textarea name="address" rows="3" required></textarea>
+    
+    <p>Телефон:</p>
+    <input type="tel" name="phone" required>
+    
+    <button type="submit">Подтвердить заказ</button>
+</form>
+{% endblock %}

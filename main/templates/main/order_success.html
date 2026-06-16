@@ -1,0 +1,8 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+<h2 style="color: green;">Спасибо за заказ!</h2>
+<p>Ваш заказ №{{ order.id }} оформлен на сумму {{ order.total }} руб.</p>
+<p>Чек отправлен на вашу почту.</p>
+<a href="/catalog/" class="btn">В магазин</a>
+{% endblock %}

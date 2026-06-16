@@ -1,8 +1,22 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
+from django.core.mail import EmailMessage
+from django.conf import settings
 from django.db.models import Q
-from .models import Product, Cart, ElemCart
+from io import BytesIO
+import openpyxl
+from .models import Product, Cart, ElemCart, Order, Manufacturer,Category, OrderItem
+from django.core.mail import send_mail
+from django.conf import settings
+from .serializers import (
+    ProductSerializer,
+    CategorySerializer,
+    ManufacturerSerializer,
+    CartSerializer,
+    ElemCartSerializer
+)
+from rest_framework import viewsets
 
 def index(request):
     return render(request, 'main/index.html')
@@ -69,3 +83,152 @@ def cart_view(request):
         'cart_items': cart_items,
         'total_cost': total_cost
     })
+@login_required
+def checkout(request):
+    cart = Cart.objects.get(user=request.user)
+    cart_items = ElemCart.objects.filter(cart=cart)
+    
+    total = sum(item.quantity * item.product.price for item in cart_items)
+    
+    if not cart_items:
+        return redirect('main:cart_view')
+    
+    if request.method == 'POST':
+        address = request.POST.get('address')
+        phone = request.POST.get('phone')
+        comment = request.POST.get('comment')
+
+        order = Order.objects.create(
+            user=request.user,
+            total_price=total,
+            status='pending',
+            address=address,
+            phone=phone,
+            comment=comment
+        )
+
+        for item in cart_items:
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                quantity=item.quantity,
+                price=item.product.price
+            )
+        send_receipt_email(request.user.email, order, cart_items, total)
+        cart_items.delete()
+        
+        return redirect('main:order_success')
+    
+    return render(request, 'main/checkout.html', {
+        'cart_items': cart_items,
+        'total': total
+    })
+
+def generate_receipt(order, cart_items, total):
+    """Простой Excel чек"""
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = f"Чек_{order.id}"
+    
+    ws['A1'] = f'Чек №{order.id}'
+    ws['A2'] = f'Дата: {order.created_at.strftime("%d.%m.%Y %H:%M")}'
+    ws['A3'] = f'Покупатель: {order.user.username}'
+    ws['A4'] = f'Email: {order.user.email}'
+    ws['A5'] = f'Телефон: {order.phone}'
+    ws['A6'] = f'Адрес: {order.address}'
+    ws['A8'] = 'Товар'
+    ws['B8'] = 'Кол-во'
+    ws['C8'] = 'Цена'
+    ws['D8'] = 'Сумма'
+    
+    row = 9
+    for item in cart_items:
+        ws[f'A{row}'] = item.product.name
+        ws[f'B{row}'] = item.quantity
+        ws[f'C{row}'] = float(item.product.price)
+        ws[f'D{row}'] = float(item.quantity * item.product.price)
+        row += 1
+    
+    ws[f'C{row}'] = 'ИТОГО:'
+    ws[f'D{row}'] = float(total)
+    
+    buffer = BytesIO()
+    wb.save(buffer)
+    buffer.seek(0)
+    return buffer
+
+def send_receipt_email(recipient_email, order, excel_file):
+    """Отправка чека на email"""
+    subject = f'Чек по заказу №{order.id}'
+    body = f'''
+Здравствуйте, {order.user.username}!
+
+Ваш заказ №{order.id} оформлен.
+Сумма: {order.total_price} руб.
+Телефон: {order.phone}
+Адрес: {order.address}
+Чек во вложении.
+Спасибо за покупку!
+'''
+    email = EmailMessage(
+        subject=subject,
+        body=body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[recipient_email]
+    )
+    email.attach(f'receipt_order_{order.id}.xlsx', excel_file.getvalue(),
+                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    email.send()
+
+def order_success(request):
+    return render(request, 'main/order_success.html')
+
+def send_receipt_email(recipient_email, order, cart_items, total):
+    """Отправка чека на email с использованием send_mail"""
+    
+    subject = f'Чек по заказу №{order.id}'
+    message = f"""
+Здравствуйте, {order.user.username}!
+
+Ваш заказ №{order.id} оформлен.
+Дата: {order.created_at.strftime('%d.%m.%Y %H:%M')}
+Сумма: {total} руб.
+Телефон: {order.phone}
+Адрес: {order.address}
+
+Состав заказа:
+"""
+    for item in cart_items:
+        message += f"- {item.product.name} x{item.quantity} = {item.quantity * item.product.price} руб.\n"
+    
+    message += f"""
+Итого: {total} руб.
+
+Спасибо за покупку!
+"""
+    send_mail(
+        subject=subject,
+        message=message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[recipient_email],
+        fail_silently=False,
+    )
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+class ManufacturerViewSet(viewsets.ModelViewSet):
+    queryset = Manufacturer.objects.all()
+    serializer_class = ManufacturerSerializer
+
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+class CartViewSet(viewsets.ModelViewSet):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+
+class ElemCartViewSet(viewsets.ModelViewSet):
+    queryset = ElemCart.objects.all()
+    serializer_class = ElemCartSerializer 
