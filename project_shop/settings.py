@@ -1,12 +1,22 @@
 from pathlib import Path
+import os
+import dj_database_url
+from decouple import config, Csv
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-k43qo_o$v#=2h!(_hjot&h^w3f3$h(mveels6m#nl+jbai_ejd'
+SECRET_KEY = config('django-insecure-k43qo_o$v#=2h!(_hjot&h^w3f3$h(mveels6m#nl+jbai_ejd')
 
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
-ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=Csv())
+ALLOWED_HOSTS.append('.up.railway.app')
+
 
 
 INSTALLED_APPS = [
@@ -19,17 +29,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
 ]
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.AuthenticationForm', 
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
 ]
+
 
 ROOT_URLCONF = 'project_shop.urls'
 
@@ -51,10 +61,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'project_shop.wsgi.application'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}",
+        conn_max_age=600
+    )
 }
 
 
