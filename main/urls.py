@@ -14,9 +14,15 @@ from .views import (
     remove_from_cart,
     cart_view,
     checkout,
-    order_success
+    order_success,
+    register_view,
+    login_view,
+    logout_view,
+    profile_view,
+    settings_view
     
 )
+from .views import me_view, OrderViewSet
 app_name = 'catalog'
 router = DefaultRouter()
 router.register(r'products', ProductViewSet, basename='product')
@@ -24,6 +30,7 @@ router.register(r'categories', CategoryViewSet, basename='category')
 router.register(r'manufacturers', ManufacturerViewSet, basename='manufacturer')
 router.register(r'carts', CartViewSet, basename='cart')
 router.register(r'elem-carts', ElemCartViewSet, basename='elemcart') 
+router.register(r'orders', OrderViewSet, basename='order')
 
 urlpatterns = [
     path('', index, name='index'),
@@ -35,6 +42,13 @@ urlpatterns = [
     path('cart/', cart_view, name='cart_view'),
     path('checkout/', checkout, name='checkout'),
     path('order-success/', order_success, name='order_success'),
+    path('api/me/', me_view, name='api_me'),
     path('api/', include(router.urls)),
+    path('register/', register_view, name='register'),
+    path('login/', login_view, name='login'),
+    path('logout/', logout_view, name='logout'),
+    path('profile/', profile_view, name='profile'),
+    path('settings/', settings_view, name='settings'),
+
 ]
 

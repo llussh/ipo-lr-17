@@ -1,0 +1,49 @@
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Настройки аккаунта</title>
+    <style>
+        body { font-family: sans-serif; background-color: #fdfbf7; color: #4a3f35; padding: 40px; }
+        .box { background: white; padding: 25px; border-radius: 12px; border: 1px solid #efeae0; max-width: 400px; }
+        input { width: 100%; padding: 10px; margin: 10px 0 20px 0; box-sizing: border-box; }
+        button { background: #8c6d53; color: white; border: none; padding: 12px 20px; cursor: pointer; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Настройки безопасности</h2>
+        <p><a href="{% url 'catalog:profile' %}">← Вернуться в профиль</a></p>
+        <hr>
+        <form id="email-form">
+            <label>Текущий или новый Email:</label>
+            <input type="email" id="email-input" required>
+            <button type="submit">Обновить Email</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const res = await fetch('/api/me/');
+            if (res.ok) {
+                const data = await res.json();
+                document.getElementById('email-input').value = data.email || '';
+            }
+
+            document.getElementById('email-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const response = await fetch('/api/me/', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.cookie.split('; ').find(row => row.startsWith('csrftoken=')).split('=')[1]
+                    },
+                    body: JSON.stringify({ email: document.getElementById('email-input').value })
+                });
+                if (response.ok) alert('Email успешно обновлен!');
+            });
+        });
+    </script>
+</body>
+</html>

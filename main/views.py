@@ -1,14 +1,22 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseBadRequest
-from django.contrib.auth.decorators import login_required
-from django.core.mail import EmailMessage
-from django.conf import settings
-from django.db.models import Q
 from io import BytesIO
 import openpyxl
-from .models import Product, Cart, ElemCart, Order, Manufacturer,Category, OrderItem
-from django.core.mail import send_mail
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.conf import settings
+from django.db.models import Q
+from django.core.paginator import Paginator
+from django.core.mail import send_mail, EmailMessage
+
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+
+from rest_framework import viewsets
+
+from .forms import RegisterForm
+from .models import Product, Cart, ElemCart, Order, Manufacturer, Category
+
 from .serializers import (
     ProductSerializer,
     CategorySerializer,
@@ -16,8 +24,13 @@ from .serializers import (
     CartSerializer,
     ElemCartSerializer
 )
-from rest_framework import viewsets
-from django.core.paginator import Paginator
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import ProfileSerializer, OrderSerializer 
+from .permissions import IsAdminOrReadOnly
+from django.views.decorators.csrf import csrf_exempt
 
 def index(request):
     popular_products = Product.objects.all().order_by('-id')[:6]
@@ -61,7 +74,7 @@ def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
     return render(request, 'main/product_detail.html', {'product': product})
 
-@login_required
+@csrf_exempt
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     cart, created = Cart.objects.get_or_create(user=request.user)
@@ -121,14 +134,11 @@ def checkout(request):
         order = Order.objects.create(
             user=request.user,
             total_price=total,
-            status='pending',
-            address=address,
-            phone=phone,
-            comment=comment
+            status='pending'
         )
 
         for item in cart_items:
-            OrderItem.objects.create(
+            ElemCart.objects.create(
                 order=order,
                 product=item.product,
                 quantity=item.quantity,
@@ -252,3 +262,68 @@ class CartViewSet(viewsets.ModelViewSet):
 class ElemCartViewSet(viewsets.ModelViewSet):
     queryset = ElemCart.objects.all()
     serializer_class = ElemCartSerializer 
+
+def register_view(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            login(request, user) 
+            return redirect('catalog:index')
+    else:
+        form = RegisterForm()
+    return render(request, 'main/register.html', {'form': form})
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('catalog:index')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'main/login.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    return redirect('catalog:index')
+
+@api_view(['GET', 'PATCH'])
+@permission_classes([IsAuthenticated])
+def me_view(request):
+    profile = request.user.profile
+    if request.method == 'GET':
+        serializer = ProfileSerializer(profile)
+        return Response(serializer.data)
+        
+    elif request.method == 'PATCH':
+        serializer = ProfileSerializer(profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = [IsAdminOrReadOnly] 
+
+class OrderViewSet(viewsets.ModelViewSet):
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if hasattr(user, 'profile') and user.profile.role == 'ADMIN':
+            return Order.objects.all()
+        return Order.objects.filter(user=user)
+def profile_view(request):
+    return render(request, 'main/profile.html')
+def settings_view(request):
+    return render(request, 'main/settings.html')

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет</title>
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Montserrat', sans-serif; background-color: #fdfbf7; color: #4a3f35; margin: 0; padding: 0; position: relative; overflow-x: hidden; }
+        #cat-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
+        .floating-cat { position: absolute; font-size: 24px; user-select: none; animation: fall linear infinite; opacity: 0.6; }
+        @keyframes fall { 0% { transform: translateY(-50px) rotate(0deg); opacity: 0; } 10% { opacity: 0.6; } 100% { transform: translateY(105vh) rotate(360deg); opacity: 0; } }
+        nav { background-color: #f4efe6; padding: 15px 0; border-bottom: 1px solid #e9dfce; }
+        nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 25px; justify-content: center; }
+        nav a { color: #6b5b4b; text-decoration: none; font-weight: 500; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 30px 20px; position: relative; z-index: 10; }
+        .flex-container { display: flex; gap: 30px; flex-wrap: wrap; margin-top: 20px; }
+        .block-section { background: #fff; border: 1px solid #efeae0; border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px rgba(140, 109, 83, 0.02); flex: 1 1 450px; }
+        h2 { margin-top: 0; color: #3d3126; font-size: 1.4rem; border-bottom: 2px solid #f4efe6; padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 0.9rem; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ede3d0; border-radius: 8px; font-family: inherit; box-sizing: border-box; color: #4a3f35; }
+        .btn-save { background-color: #8c6d53; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; font-family: inherit; }
+        .btn-save:hover { background-color: #735943; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.95rem; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f4efe6; }
+        th { background-color: #f7f0e3; color: #3d3126; font-weight: 600; }
+        .btn-order-detail { background-color: #f4efe6; color: #6b5b4b; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; }
+        .btn-order-detail:hover { background-color: #e9dfce; }
+        #toast { position: fixed; bottom: 20px; right: 20px; color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 10000; }
+        #toast.show { transform: translateY(0); opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <div id="cat-container"></div>
+    <div id="toast"></div>
+
+    <nav>
+        <ul>
+            <li><a href="{% url 'catalog:index' %}">Главная</a></li>
+            <li><a href="{% url 'catalog:product_list' %}">Каталог</a></li>
+            <li><a href="{% url 'catalog:logout' %}">Выйти</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        {% if not user.is_authenticated %}
+            <div style="text-align: center; padding: 50px 20px; background: white; border-radius: 12px; border: 1px solid #efeae0;">
+                <h3 style="color: #c45a4a; margin-bottom: 15px;">Вы не авторизованы</h3>
+                <p style="color: #7a6a58; margin-bottom: 25px;">Для просмотра личного кабинета необходимо войти в свой аккаунт.</p>
+                <a href="{% url 'catalog:login' %}" style="background-color: #8c6d53; color: white; padding: 12px 30px; text-decoration: none; font-weight: 600; border-radius: 8px;">Войти в аккаунт</a>
+            </div>
+        {% else %}
+            <h1>Личный кабинет</h1>
+            <p><a href="{% url 'catalog:settings' %}" style="color: #8c6d53; font-weight: 600;">⚙ Перейти в настройки аккаунта</a></p>
+            <a href="{% url 'catalog:cart_view' %}" style="background-color: #8c6d53; color: white; padding: 8px 16px; text-decoration: none; font-weight: 600; border-radius: 8px; display: inline-block;">🛒 Перейти в корзину</a>
+            <a href="{% url 'catalog:checkout' %}" style="background-color: #8c6d53; color: white; padding: 8px 16px; text-decoration: none; font-weight: 600; border-radius: 8px; display: inline-block;">📦 Оформить заказ</a>
+            <div class="flex-container">
+                <section class="block-section">
+                    <h2>Мой профиль</h2>
+                    <p>Ваш статус в системе: <strong id="user-role-badge" style="color: #8c6d53;">Загрузка...</strong></p>
+                    <form id="profile-form">
+                        <div class="form-group">
+                            <label>ФИО</label>
+                            <input type="text" id="full_name" name="full_name" placeholder="Введите ФИО">
+                        </div>
+                        <div class="form-group">
+                            <label>Телефон</label>
+                            <input type="text" id="phone" name="phone" placeholder="Введите номер телефона">
+                        </div>
+                        <div class="form-group">
+                            <label>Адрес доставки</label>
+                            <textarea id="address" name="address" rows="3" placeholder="Введите адрес"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Микрорайон (г. Минск)</label>
+                            <input type="text" id="district" name="district" placeholder="Например, Малиновка, Уручье">
+                        </div>
+                        <div class="form-group">
+                            <label>Почтовый индекс</label>
+                            <input type="text" id="postal_code" name="postal_code" placeholder="Например, 220000">
+                        </div>
+                        <button type="submit" class="btn-save">Сохранить изменения</button>
+                    </form>
+                </section>
+
+                <section class="block-section">
+                    <h2>Мои заказы</h2>
+                    <div id="orders-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>№ Заказа</th>
+                                    <th>Дата</th>
+                                    <th>Статус</th>
+                                    <th>Действие</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-tbody">
+                            </tbody>
+                        </table>
+                        <p id="no-orders" style="display: none; text-align: center; color: #7a6a58; padding: 20px 0;">У вас пока нет заказов.</p>
+                    </div>
+                </section>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if user.is_authenticated %}
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const toast = document.getElementById('toast');
+            
+            function showToast(msg, isSuccess = true) {
+                toast.innerText = msg;
+                toast.style.backgroundColor = isSuccess ? '#4e8c53' : '#c45a4a';
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            }
+
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            // Загрузка данных профиля
+            try {
+                const res = await fetch('/api/me/');
+                if (res.ok) {
+                    const data = await res.json();
+                    const roleNames = { 'CUSTOMER': 'Клиент', 'MANAGER': 'Менеджер', 'ADMIN': 'Администратор' };
+                    document.getElementById('user-role-badge').innerText = roleNames[data.role] || data.role;
+                    document.getElementById('full_name').value = data.full_name || '';
+                    document.getElementById('phone').value = data.phone || '';
+                    document.getElementById('address').value = data.address || '';
+                    document.getElementById('district').value = data.district || '';
+                    document.getElementById('postal_code').value = data.postal_code || '';
+                }
+            } catch (err) { console.error(err); }
+
+            // Сохранение профиля
+            document.getElementById('profile-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const payload = {
+                    full_name: document.getElementById('full_name').value,
+                    phone: document.getElementById('phone').value,
+                    address: document.getElementById('address').value,
+                    district: document.getElementById('district').value,
+                    postal_code: document.getElementById('postal_code').value,
+                };
+
+                try {
+                    const res = await fetch('/api/me/', {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    if (res.ok) {
+                        showToast('Профиль успешно сохранен! 🐈');
+                    } else {
+                        showToast('Ошибка при сохранении данных', false);
+                    }
+                } catch (err) {
+                    showToast('Сбой сети', false);
+                }
+            });
+
+            // Загрузка заказов
+            const tbody = document.getElementById('orders-tbody');
+            const noOrders = document.getElementById('no-orders');
+
+            try {
+                const res = await fetch('/api/orders/');
+                if (res.ok) {
+                    const orders = await res.json();
+                    if (orders.length === 0) {
+                        noOrders.style.display = 'block';
+                        tbody.parentElement.style.display = 'none';
+                    } else {
+                        orders.forEach(order => {
+                            const tr = document.createElement('tr');
+                            const date = new Date(order.created_at || Date.now()).toLocaleDateString('ru-RU');
+                            tr.innerHTML = `<td>#${order.id}</td> <td>${date}</td> <td><span style="font-weight:600; color:#8c6d53;">${order.status || 'В обработке'}</span></td> <td><a href="/catalog/order/${order.id}/" class="btn-order-detail">Подробнее</a></td>`;
+                            tbody.appendChild(tr);
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+            }
+
+            // Летающие котики
+            const catContainer = document.getElementById('cat-container');
+            const catEmojis = ['🐱', '🐈', '🐾', '😸', '😻', '🐈‍⬛'];
+
+            function createCat() {
+                const cat = document.createElement('div');
+                cat.classList.add('floating-cat');
+                cat.innerText = catEmojis[Math.floor(Math.random() * catEmojis.length)];
+                cat.style.left = Math.random() * 100 + 'vw';
+                const duration = Math.random() * 4 + 5;
+                cat.style.animationDuration = duration + 's';
+                cat.style.fontSize = Math.random() * 12 + 20 + 'px';
+                catContainer.appendChild(cat);
+                setTimeout(() => { cat.remove(); }, duration * 1000);
+            }
+
+            setInterval(createCat, 700);
+        });
+    </script>
+    {% endif %}
+</body>
+</html>

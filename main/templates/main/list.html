@@ -44,7 +44,7 @@
             max-width: 1200px; margin: 0 auto; padding: 30px 20px;
         }
         
-        /* Правая сетка товаров */
+    
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -67,7 +67,6 @@
         .btn-submit { background-color: #8c6d53; color: #fff; border: none; padding: 12px; cursor: pointer; width: 100%; }
         .btn-submit:disabled { background-color: #dcd6cd; color: #a89f91; cursor: not-allowed; }
 
-        /* Стили Спиннера загрузки (Пункт 4) */
         .spinner {
             width: 50px; height: 50px;
             border: 5px solid #f4efe6; border-top: 5px solid #8c6d53;
@@ -76,14 +75,12 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Блок ошибки (Пункт 5) */
         .error-alert {
             background-color: #fcedeb; color: #c45a4a;
             border: 1px solid #f5d2cd; padding: 15px;
             border-radius: 8px; display: none; text-align: center; margin-top: 20px;
         }
 
-        /* Toast-уведомление (Пункт 3) */
         .toast-notification {
             position: fixed; bottom: 20px; right: 20px;
             color: white; padding: 15px 25px; border-radius: 8px;
@@ -99,34 +96,39 @@
 
     <div id="cat-container"></div>
     
-    <!-- Компонент всплывающего уведомления -->
     <div id="toast-notification" class="toast-notification">Товар добавлен!</div>
 
-    <nav>
+     <nav>
         <ul>
             <li><a href="{% url 'catalog:index' %}">Главная</a></li>
             <li><a href="{% url 'catalog:product_list' %}">Каталог</a></li>
-            <li><a href="/admin/">Админ-панель</a></li>
+            
+            {% if user.is_authenticated %}
+                <li><strong>Привет, {{ user.username }}!</strong></li>
+                <li><a href="{% url 'catalog:logout' %}">Выйти</a></li>
+            {% else %}
+                <li><a href="{% url 'catalog:login' %}">Войти</a></li>
+                <li><a href="{% url 'catalog:register' %}">Регистрация</a></li>
+            {% endif %}
+            <li><a href="{% url 'catalog:profile' %}">Личный кабинет</a></li>
+
         </ul>
     </nav>
 
-    <div class="container">
-        <h2>Каталог товаров (Динамический API)</h2>
 
-        <!-- ИНДИКАТОР ЗАГРУЗКИ (Спиннер) -->
+    <div class="container">
+        <h2>Каталог товаров</h2>
+
         <div id="loading-spinner" class="spinner"></div>
 
-        <!-- СООБЩЕНИЕ ОБ ОШИБКЕ -->
         <div id="error-message" class="error-alert"></div>
 
-        <!-- СЕТКА ДЛЯ ДИНАМИЧЕСКИХ ТОВАРОВ ИЗ JS -->
         <div id="api-product-grid" class="product-grid"></div>
     </div>
 
-    <!-- ПОДКЛЮЧЕНИЕ СКРИПТА MAIN.JS ИЗ СТАТИКИ -->
-    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/main.js' %}?v=99"></script>
 
-    <!-- Скрипт котиков -->
+
     <script>
         const catContainer = document.getElementById('cat-container');
         const catEmojis = ['🐱', '🐈', '🐾', '😸', '😻', '🐈‍⬛'];

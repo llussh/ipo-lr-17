@@ -83,8 +83,6 @@
         .btn-catalog:hover {
             background-color: #735943;
         }
-
-        /* Сетка популярных товаров */
         h2 {
             font-size: 1.8rem;
             font-weight: 600;
@@ -133,8 +131,6 @@
         .btn-detail:hover {
             text-decoration: underline;
         }
-
-        /* Список категорий */
         .category-list {
             display: flex;
             flex-wrap: wrap;
@@ -161,25 +157,32 @@
     </style>
 </head>
 <body>
-
-    <!-- Навигационная панель -->
     <nav>
         <ul>
-            <li><a href="{% url 'catalog:index' %}">Главная</a></li>
-            <li><a href="{% url 'catalog:product_list' %}">Каталог</a></li>
-            <li><a href="/admin/">Админ-панель</a></li>
+             <li><a href="{% url 'catalog:index' %}">Главная</a></li>
+        <li><a href="{% url 'catalog:product_list' %}">Каталог</a></li>
+        
+        {% if user.is_authenticated %}
+         <li><a href="/admin/" target="_blank" style="font-weight: 600; color: #8c6d53;">Панель администратора</a></li>
+            <li><strong>Привет, {{ user.username }}!</strong></li>
+            <li><a href="{% url 'catalog:logout' %}">Выйти</a></li>
+        {% else %}
+            <li><a href="{% url 'catalog:login' %}">Войти</a></li>
+            <li><a href="{% url 'catalog:register' %}">Регистрация</a></li>
+        {% endif %}
+        <li><a href="{% url 'catalog:profile' %}">Личный кабинет</a></li>
+
         </ul>
     </nav>
 
     <div class="container">
-        <!-- 1. Hero-секция -->
         <section class="hero">
-            <h1>Добро пожаловать в ShopProject!</h1>
-            <p>Уютная атмосфера и лучшие эстетичные товары для вашего дома.</p>
+            <h1>Добро пожаловать в ArtShop!</h1>
+            <p>Качественные худжественные товары по доступным ценам.</p>
             <a href="{% url 'catalog:product_list' %}" class="btn-catalog">Перейти в каталог</a>
         </section>
 
-        <!-- 2. Секция популярных товаров -->
+    
         <section>
             <h2>Популярные товары</h2>
             <div class="product-grid">
@@ -197,7 +200,6 @@
             </div>
         </section>
 
-        <!-- 3. Секция категорий -->
         <section style="margin-top: 40px; margin-bottom: 60px;">
             <h2>Категории товаров</h2>
             <ul class="category-list">

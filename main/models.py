@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Manufacturer(models.Model):
     name = models.CharField(max_length = 100)
@@ -70,3 +72,50 @@ class OrderItem(models.Model):
     
     def __str__(self):
         return f"{self.product.name} x {self.quantity}"
+    
+class Profile(models.Model):
+    ROLE_CHOICES = [
+        ('CUSTOMER', 'Клиент'),
+        ('MANAGER', 'Менеджер'),
+        ('ADMIN', 'Администратор'),
+    ]
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='CUSTOMER', verbose_name='Роль')
+    
+    full_name = models.CharField(max_length=255, blank=True, null=True, verbose_name='ФИО')
+    phone = models.CharField(max_length=20, blank=True, null=True, verbose_name='Телефон')
+    address = models.TextField(blank=True, null=True, verbose_name='Адрес доставки')
+
+    class Meta:
+        verbose_name = 'Profile'
+        verbose_name_plural = 'Profile'
+
+    def __str__(self):
+        return f"Профиль: {self.user.username} ({self.get_role_display()})"
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    if hasattr(instance, 'profile'):
+        instance.profile.save()
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    role = models.CharField(max_length=20, choices=[('CUSTOMER', 'Клиент'), ('MANAGER', 'Менеджер'), ('ADMIN', 'Администратор')], default='CUSTOMER', verbose_name='Роль')
+    full_name = models.CharField(max_length=255, blank=True, null=True, verbose_name='ФИО')
+    phone = models.CharField(max_length=20, blank=True, null=True, verbose_name='Телефон')
+    address = models.TextField(blank=True, null=True, verbose_name='Адрес доставки')
+    district = models.CharField(max_length=100, blank=True, null=True, verbose_name='Микрорайон Минска')
+    postal_code = models.CharField(max_length=10, blank=True, null=True, verbose_name='Почтовый индекс')
+
+    class Meta:
+        verbose_name = 'Профиль пользователя'
+        verbose_name_plural = 'Профили пользователей'
+
+    def __str__(self):
+        return f"Профиль: {self.user.username} ({self.get_role_display()})"
