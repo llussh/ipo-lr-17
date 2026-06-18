@@ -139,6 +139,7 @@ def checkout(request):
 
         for item in cart_items:
             ElemCart.objects.create(
+                cart=cart,
                 order=order,
                 product=item.product,
                 quantity=item.quantity,
@@ -327,3 +328,5 @@ def profile_view(request):
     return render(request, 'main/profile.html')
 def settings_view(request):
     return render(request, 'main/settings.html')
+def test(request):
+    return render(request, 'test.html')

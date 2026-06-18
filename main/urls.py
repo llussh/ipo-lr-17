@@ -1,5 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from . import views
 from .views import (
     ProductViewSet,
     CategoryViewSet,
@@ -49,6 +50,7 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
     path('profile/', profile_view, name='profile'),
     path('settings/', settings_view, name='settings'),
+    path('test/', views.test, name='test'),
 
 ]
 

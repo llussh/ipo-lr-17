@@ -2,42 +2,71 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Магазин{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заказ оформлен!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f0eb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 500px;
+        }
+        .emoji {
+            font-size: 80px;
+            display: block;
+            margin-bottom: 10px;
+        }
+        h1 {
+            color: #4e8c53;
+            font-size: 32px;
+            margin: 10px 0;
+        }
+        p {
+            color: #666;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        .order-number {
+            color: #8c6d53;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .btn {
+            display: inline-block;
+            background: #8c6d53;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-top: 20px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #6d5340;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <strong>Интернет-магазин</strong> | 
-        <a href="{% url 'catalog:index' %}">Главная</a> | 
-        <a href="{% url 'catalog:product_list' %}">Каталог</a> | 
-        <a href="{% url 'catalog:cart_view' %}">Корзина</a>
-        
-        <hr>
-        <div>
-            {% if user.is_authenticated %}
-                <span>Пользователь: {{ user.username }}</span>
-                <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit">Выйти</button>
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}">Войти</a>
-            {% endif %}
-        </div>
-        <hr>
-    </header>
-
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
-
-    <footer>
-        <hr>
-        <p>&copy; 2026 Мой Магазин. Все права защищены.</p>
-    </footer>
-
-    {% block scripts %}
-    {% endblock %}
-
+    <div class="card">
+        <span class="emoji">🎉</span>
+        <h1>Заказ оформлен!</h1>
+        <p>Спасибо за покупку!<br>Мы свяжемся с вами в ближайшее время.</p>
+        <p><span class="order-number">Номер заказа: #{{ order.id }}</span></p>
+        <a href="/catalog/" class="btn">Продолжить покупки</a>
+    </div>
 </body>
 </html>

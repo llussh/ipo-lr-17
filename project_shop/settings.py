@@ -5,18 +5,11 @@ from decouple import config, Csv
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-SECRET_KEY = config('django-insecure-k43qo_o$v#=2h!(_hjot&h^w3f3$h(mveels6m#nl+jbai_ejd')
-
+SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=True, cast=bool)
-if not DEBUG:
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-
-
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=Csv())
-ALLOWED_HOSTS.append('.up.railway.app')
 
+ALLOWED_HOSTS.append('.up.railway.app')
 
 
 INSTALLED_APPS = [
@@ -35,7 +28,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationForm', 
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -50,6 +43,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
