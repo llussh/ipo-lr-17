@@ -8,54 +8,286 @@
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Montserrat', sans-serif; background-color: #fdfbf7; color: #4a3f35; margin: 0; padding: 0; position: relative; overflow-x: hidden; }
-        #cat-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
-        .floating-cat { position: absolute; font-size: 24px; user-select: none; animation: fall linear infinite; opacity: 0.6; }
-        @keyframes fall { 0% { transform: translateY(-50px) rotate(0deg); opacity: 0; } 10% { opacity: 0.6; } 100% { transform: translateY(105vh) rotate(360deg); opacity: 0; } }
-        nav { background-color: #f4efe6; padding: 15px 0; border-bottom: 1px solid #e9dfce; }
-        nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 25px; justify-content: center; }
-        nav a { color: #6b5b4b; text-decoration: none; font-weight: 500; }
-        .container { max-width: 600px; margin: 50px auto; padding: 30px; background: white; border-radius: 12px; border: 1px solid #efeae0; box-shadow: 0 4px 6px rgba(140, 109, 83, 0.01); position: relative; z-index: 10; }
-        h1 { margin-top: 0; color: #3d3126; font-size: 1.8rem; border-bottom: 2px solid #f4efe6; padding-bottom: 10px; text-align: center; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; }
-        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ede3d0; border-radius: 8px; font-family: inherit; box-sizing: border-box; color: #4a3f35; font-size: 0.95rem; }
-        .btn-order { background-color: #8c6d53; color: white; border: none; padding: 14px 28px; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; font-family: inherit; width: 100%; margin-top: 10px; transition: background 0.3s ease; }
-        .btn-order:hover { background-color: #735943; }
-        .back-link { display: block; text-align: center; margin-top: 20px; color: #8c6d53; text-decoration: none; font-weight: 500; font-size: 0.9rem; }
-        .back-link:hover { text-decoration: underline; }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #fff4e6;
+            color: #4a3f35;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        #car-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .floating-car {
+            position: absolute;
+            font-size: 24px;
+            user-select: none;
+            animation: fall linear infinite;
+            opacity: 0.5;
+        }
+        @keyframes fall {
+            0% {
+                transform: translateY(-50px) rotate(0deg) scale(0.5);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(105vh) rotate(720deg) scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        nav {
+            background: #f57c00;
+            padding: 15px 0;
+            border-bottom: 4px solid #2e7d32;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        nav a:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.05);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 16px;
+            border: 2px solid #f57c00;
+            box-shadow: 0 8px 30px rgba(245, 124, 0, 0.15);
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #e65100;
+            font-size: 2rem;
+            border-bottom: 3px solid #f57c00;
+            padding-bottom: 15px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        h1 .emoji {
+            font-size: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #4a3f35;
+        }
+        .form-group label .required {
+            color: #d32f2f;
+            margin-left: 3px;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ede3d0;
+            border-radius: 10px;
+            font-family: inherit;
+            box-sizing: border-box;
+            color: #4a3f35;
+            font-size: 0.95rem;
+            transition: border-color 0.3s ease;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #f57c00;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(245, 124, 0, 0.1);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+
+        .hint {
+            display: block;
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 5px;
+        }
+        .hint span {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        .btn-order {
+            background: linear-gradient(135deg, #f57c00, #e65100);
+            color: white;
+            border: none;
+            padding: 16px 28px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-order:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 124, 0, 0.4);
+        }
+        .btn-order:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(245, 124, 0, 0.3);
+        }
+        .btn-order::after {
+            content: ' 🚗';
+            font-size: 1.2rem;
+        }
+
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            color: #2e7d32;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+        .back-link:hover {
+            color: #1b5e20;
+            text-decoration: underline;
+        }
+
+        .input-icon {
+            position: relative;
+        }
+        .input-icon input,
+        .input-icon textarea {
+            padding-left: 45px;
+        }
+        .input-icon .icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+        .input-icon.textarea .icon {
+            top: 18px;
+            transform: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 25px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            nav ul {
+                gap: 15px;
+            }
+            nav a {
+                font-size: 0.9rem;
+                padding: 6px 15px;
+            }
+        }
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            h1 .emoji {
+                font-size: 30px;
+            }
+            .btn-order {
+                font-size: 1rem;
+                padding: 14px 20px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div id="cat-container"></div>
+   
+    <div id="car-container"></div>
 
     <nav>
         <ul>
-            <li><a href="{% url 'catalog:index' %}">Главная</a></li>
-            <li><a href="{% url 'catalog:product_list' %}">Каталог</a></li>
-            <li><a href="{% url 'catalog:cart_view' %}">Корзина</a></li>
+            <li><a href="{% url 'catalog:index' %}">🏠 Главная</a></li>
+            <li><a href="{% url 'catalog:product_list' %}">📦 Каталог</a></li>
+            <li><a href="{% url 'catalog:cart_view' %}">🛒 Корзина</a></li>
         </ul>
     </nav>
 
     <div class="container">
-        <h1>Оформление заказа</h1>
+        <h1>
+            <span class="emoji">🚗</span>
+            Оформление заказа
+            <span class="emoji">🚗</span>
+        </h1>
+
         <form method="post" action="">
             {% csrf_token %}
             
-            <div class="form-group">
-                <label>ФИО получателя</label>
+            <div class="form-group input-icon">
+                <label>ФИО получателя <span class="required">*</span></label>
+                <span class="icon">👤</span>
                 <input type="text" name="full_name" value="{{ user.profile.full_name|default:'' }}" required placeholder="Иванов Иван Иванович">
             </div>
 
-            <div class="form-group">
-                <label>Контактный телефон</label>
+            <div class="form-group input-icon">
+                <label>Контактный телефон <span class="required">*</span></label>
+                <span class="icon">📱</span>
                 <input type="text" name="phone" value="{{ user.profile.phone|default:'' }}" required placeholder="+375 (XX) XXX-XX-XX">
             </div>
 
-            <div class="form-group">
-                <label>Адрес доставки (г. Минск)</label>
-                <textarea name="address" rows="3" required placeholder="Улица, дом, квартира (Микрорайон: {{ user.profile.district|default:'не указан' }})">{{ user.profile.address|default:'' }}</textarea>
+            <div class="form-group input-icon textarea">
+                <label>Адрес доставки <span class="required">*</span></label>
+                <span class="icon">📍</span>
+                <textarea name="address" rows="3" required placeholder="Улица, дом, квартира">{{ user.profile.address|default:'' }}</textarea>
+                <span class="hint">Микрорайон: <span>{{ user.profile.district|default:'не указан' }}</span></span>
             </div>
 
             <button type="submit" class="btn-order">Подтвердить заказ</button>
@@ -65,20 +297,25 @@
     </div>
 
     <script>
-        const catContainer = document.getElementById('cat-container');
-        const catEmojis = ['🐱', '🐈', '🐾', '😸', '😻', '🐈‍⬛'];
-        function createCat() {
-            const cat = document.createElement('div');
-            cat.classList.add('floating-cat');
-            cat.innerText = catEmojis[Math.floor(Math.random() * catEmojis.length)];
-            cat.style.left = Math.random() * 100 + 'vw';
+        const carContainer = document.getElementById('car-container');
+        const carEmojis = ['🚗', '🚕', '🚙', '🚘', '🚖', '🏎️'];
+        
+        function createCar() {
+            const car = document.createElement('div');
+            car.classList.add('floating-car');
+            car.innerText = carEmojis[Math.floor(Math.random() * carEmojis.length)];
+            car.style.left = Math.random() * 100 + 'vw';
             const duration = Math.random() * 4 + 5;
-            cat.style.animationDuration = duration + 's';
-            cat.style.fontSize = Math.random() * 12 + 20 + 'px';
-            catContainer.appendChild(cat);
-            setTimeout(() => { cat.remove(); }, duration * 1000);
+            car.style.animationDuration = duration + 's';
+            car.style.fontSize = Math.random() * 16 + 20 + 'px';
+            carContainer.appendChild(car);
+            setTimeout(() => {
+                car.remove();
+            }, duration * 1000);
         }
-        setInterval(createCat, 700);
+        
+
+        setInterval(createCar, 700);
     </script>
 </body>
 </html>

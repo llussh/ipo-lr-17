@@ -9,5 +9,6 @@ urlpatterns = [
     path('accounts/login/', auth_views.LoginView.as_view(template_name='main/login.html'), name='login'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('', include('main.urls', namespace='main')),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

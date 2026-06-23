@@ -156,3 +156,30 @@ async function secureFetch(url, options = {}) {
 
     loadProducts();
 });
+
+// Функция загрузки товаров с фильтрами
+function loadProducts(filters = {}) {
+    const spinner = document.getElementById('loading-spinner');
+    const grid = document.getElementById('api-product-grid');
+    const errorEl = document.getElementById('error-message');
+    
+    spinner.style.display = 'block';
+    grid.innerHTML = '';
+    errorEl.style.display = 'none';
+    
+    const params = new URLSearchParams(filters);
+    fetch(`/api/products/?${params}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Ошибка загрузки');
+            return response.json();
+        })
+        .then(data => {
+            spinner.style.display = 'none';
+            renderProducts(data);
+        })
+        .catch(error => {
+            spinner.style.display = 'none';
+            errorEl.textContent = '❌ ' + error.message;
+            errorEl.style.display = 'block';
+        });
+}

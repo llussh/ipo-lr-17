@@ -1,48 +1,528 @@
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Настройки аккаунта</title>
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; background-color: #fdfbf7; color: #4a3f35; padding: 40px; }
-        .box { background: white; padding: 25px; border-radius: 12px; border: 1px solid #efeae0; max-width: 400px; }
-        input { width: 100%; padding: 10px; margin: 10px 0 20px 0; box-sizing: border-box; }
-        button { background: #8c6d53; color: white; border: none; padding: 12px 20px; cursor: pointer; border-radius: 8px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #fff4e6;
+            color: #4a3f35;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        #car-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .floating-car {
+            position: absolute;
+            font-size: 24px;
+            user-select: none;
+            animation: fall linear infinite;
+            opacity: 0.4;
+        }
+        @keyframes fall {
+            0% {
+                transform: translateY(-50px) rotate(0deg) scale(0.5);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.4;
+            }
+            100% {
+                transform: translateY(105vh) rotate(720deg) scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        .box {
+            background: white;
+            padding: 45px 40px;
+            border-radius: 20px;
+            border-top: 6px solid #f57c00;
+            border-bottom: 6px solid #2e7d32;
+            box-shadow: 0 10px 40px rgba(245, 124, 0, 0.12);
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .box::before {
+            content: '🚗';
+            position: absolute;
+            top: -25px;
+            right: -15px;
+            font-size: 70px;
+            opacity: 0.05;
+            transform: rotate(15deg);
+        }
+        .box::after {
+            content: '🚗';
+            position: absolute;
+            bottom: -25px;
+            left: -15px;
+            font-size: 60px;
+            opacity: 0.05;
+            transform: rotate(-10deg);
+        }
+
+        .box-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .box-header .emoji {
+            font-size: 40px;
+        }
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #e65100;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f5f0eb;
+            padding-bottom: 15px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #2e7d32;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-bottom: 5px;
+        }
+        .back-link:hover {
+            color: #1b5e20;
+            transform: translateX(-3px);
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid #f5f0eb;
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            color: #4a3f35;
+        }
+        .form-group label .required {
+            color: #d32f2f;
+            margin-left: 3px;
+        }
+        .form-group .input-wrapper {
+            position: relative;
+        }
+        .form-group .input-wrapper .icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            opacity: 0.6;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 14px 18px 14px 48px;
+            border: 2px solid #ede3d0;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fdfbf7;
+            color: #4a3f35;
+        }
+        .form-group input:focus {
+            border-color: #f57c00;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(245, 124, 0, 0.1);
+            background: white;
+        }
+        .form-group input::placeholder {
+            color: #bbb;
+        }
+        .form-group .hint {
+            display: block;
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            flex: 1;
+            min-width: 150px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f57c00, #e65100);
+            color: white;
+            box-shadow: 0 4px 20px rgba(245, 124, 0, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(245, 124, 0, 0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-outline {
+            background: transparent;
+            color: #4a3f35;
+            border: 2px solid #e0d6cc;
+            flex: 0.5;
+        }
+        .btn-outline:hover {
+            border-color: #f57c00;
+            color: #f57c00;
+            transform: translateY(-2px);
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            color: white;
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            transform: translateY(120px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10000;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        #toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        #toast.success {
+            background: linear-gradient(135deg, #2e7d32, #1b5e20);
+        }
+        #toast.error {
+            background: linear-gradient(135deg, #c62828, #b71c1c);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .box {
+                padding: 30px 25px;
+                border-radius: 16px;
+            }
+            h2 {
+                font-size: 1.4rem;
+            }
+            .box-header .emoji {
+                font-size: 30px;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .btn-outline {
+                flex: 1;
+            }
+            #toast {
+                left: 20px;
+                right: 20px;
+                bottom: 20px;
+                text-align: center;
+                justify-content: center;
+            }
+        }
+        @media (max-width: 400px) {
+            .box {
+                padding: 20px 15px;
+            }
+            .form-group input {
+                padding: 12px 15px 12px 42px;
+                font-size: 0.9rem;
+            }
+            .btn {
+                font-size: 0.9rem;
+                padding: 12px 20px;
+            }
+        }
     </style>
 </head>
 <body>
+
+    <div id="car-container"></div>
+    <div id="toast"></div>
+
     <div class="box">
-        <h2>Настройки безопасности</h2>
-        <p><a href="{% url 'catalog:profile' %}">← Вернуться в профиль</a></p>
+        <div class="box-header">
+            <span class="emoji">🚗</span>
+            <h2>Настройки аккаунта</h2>
+        </div>
+
+        <a href="{% url 'catalog:profile' %}" class="back-link">← Вернуться в профиль</a>
+
+        <div class="subtitle">
+            ⚙ Управление безопасностью и личными данными
+        </div>
+
         <hr>
-        <form id="email-form">
-            <label>Текущий или новый Email:</label>
-            <input type="email" id="email-input" required>
-            <button type="submit">Обновить Email</button>
+
+        <form id="settings-form">
+            <div class="form-group">
+                <label for="email-input">📧 Электронная почта <span class="required">*</span></label>
+                <div class="input-wrapper">
+                    <span class="icon">✉️</span>
+                    <input type="email" id="email-input" placeholder="your@email.com" required>
+                </div>
+                <span class="hint">На этот адрес будут приходить уведомления о заказах</span>
+            </div>
+
+            <div class="form-group">
+                <label for="current-password">🔒 Текущий пароль</label>
+                <div class="input-wrapper">
+                    <span class="icon">🔑</span>
+                    <input type="password" id="current-password" placeholder="Введите текущий пароль">
+                </div>
+                <span class="hint">Введите пароль для подтверждения изменений</span>
+            </div>
+
+            <div class="form-group">
+                <label for="new-password">🔐 Новый пароль</label>
+                <div class="input-wrapper">
+                    <span class="icon">🛡️</span>
+                    <input type="password" id="new-password" placeholder="Введите новый пароль">
+                </div>
+                <span class="hint">Минимум 8 символов</span>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm-password">✅ Подтверждение пароля</label>
+                <div class="input-wrapper">
+                    <span class="icon">✓</span>
+                    <input type="password" id="confirm-password" placeholder="Повторите новый пароль">
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary" id="save-btn">
+                    💾 Сохранить изменения
+                </button>
+                <a href="{% url 'catalog:profile' %}" class="btn btn-outline">Отмена</a>
+            </div>
+
+            <div style="margin-top: 15px; text-align: center; font-size: 0.85rem; color: #999;">
+                <span>🚗 Все изменения сохраняются автоматически</span>
+            </div>
         </form>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            const res = await fetch('/api/me/');
-            if (res.ok) {
-                const data = await res.json();
-                document.getElementById('email-input').value = data.email || '';
+            const toast = document.getElementById('toast');
+            const emailInput = document.getElementById('email-input');
+            const saveBtn = document.getElementById('save-btn');
+
+            function showToast(msg, isSuccess = true) {
+                toast.textContent = msg;
+                toast.className = isSuccess ? 'success show' : 'error show';
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(() => toast.classList.remove('show'), 3500);
             }
 
-            document.getElementById('email-form').addEventListener('submit', async (e) => {
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            try {
+                const res = await fetch('/api/me/');
+                if (res.ok) {
+                    const data = await res.json();
+                    emailInput.value = data.email || '';
+                }
+            } catch (err) {
+                console.error(err);
+            }
+
+            document.getElementById('settings-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const response = await fetch('/api/me/', {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': document.cookie.split('; ').find(row => row.startsWith('csrftoken=')).split('=')[1]
-                    },
-                    body: JSON.stringify({ email: document.getElementById('email-input').value })
-                });
-                if (response.ok) alert('Email успешно обновлен!');
+
+                const email = emailInput.value.trim();
+                const currentPassword = document.getElementById('current-password').value;
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+
+                if (!email) {
+                    showToast('❌ Введите email', false);
+                    return;
+                }
+
+                if (newPassword && newPassword.length < 8) {
+                    showToast('❌ Пароль должен содержать минимум 8 символов', false);
+                    return;
+                }
+
+                if (newPassword && newPassword !== confirmPassword) {
+                    showToast('❌ Пароли не совпадают', false);
+                    return;
+                }
+
+                if (newPassword && !currentPassword) {
+                    showToast('❌ Введите текущий пароль для смены', false);
+                    return;
+                }
+
+                const payload = { email };
+                if (newPassword) {
+                    payload.current_password = currentPassword;
+                    payload.new_password = newPassword;
+                }
+
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<span class="spinner"></span> Сохранение...';
+
+                try {
+                    const res = await fetch('/api/me/', {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (res.ok) {
+                        showToast('✅ Настройки успешно сохранены! 🚗');
+                        document.getElementById('current-password').value = '';
+                        document.getElementById('new-password').value = '';
+                        document.getElementById('confirm-password').value = '';
+                    } else {
+                        const errorData = await res.json().catch(() => ({}));
+                        showToast(`❌ ${errorData.error || 'Ошибка при сохранении'}`, false);
+                    }
+                } catch (err) {
+                    showToast('❌ Ошибка сети', false);
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '💾 Сохранить изменения';
+                }
             });
+
+            const carContainer = document.getElementById('car-container');
+            const carEmojis = ['🚗', '🚕', '🚙', '🚘', '🚖', '🏎️'];
+
+            function createCar() {
+                const car = document.createElement('div');
+                car.classList.add('floating-car');
+                car.innerText = carEmojis[Math.floor(Math.random() * carEmojis.length)];
+                car.style.left = Math.random() * 100 + 'vw';
+                const duration = Math.random() * 4 + 5;
+                car.style.animationDuration = duration + 's';
+                car.style.fontSize = Math.random() * 16 + 20 + 'px';
+                carContainer.appendChild(car);
+                setTimeout(() => {
+                    car.remove();
+                }, duration * 1000);
+            }
+            setInterval(createCar, 700);
         });
     </script>
 </body>

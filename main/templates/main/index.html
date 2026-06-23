@@ -4,133 +4,236 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Главная - Мой магазин</title>
-    <!-- Подключаем элегантный и современный шрифт Montserrat -->
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* Базовые стили для мягкого кремового фона */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: #fdfbf7; /* Нежный кремовый цвет */
-            color: #4a3f35; /* Уютный темно-коричневый текст вместо резкого черного */
+            background: #fff4e6;
+            color: #4a3f35;
             margin: 0;
             padding: 0;
             line-height: 1.6;
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
-
-        /* Красивая навигационная панель */
         nav {
-            background-color: #f4efe6; /* Более насыщенный крем для контраста */
-            padding: 15px 0;
-            border-bottom: 1px solid #e9dfce;
+            background: linear-gradient(135deg, #f57c00, #e65100);
+            padding: 18px 0;
+            border-bottom: 4px solid #2e7d32;
+            box-shadow: 0 4px 15px rgba(245, 124, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
         nav ul {
             list-style: none;
             margin: 0;
-            padding: 0;
+            padding: 0 20px;
             display: flex;
             gap: 25px;
             justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
         }
         nav a {
-            color: #6b5b4b;
+            color: white;
             text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 20px;
         }
         nav a:hover {
-            color: #b38b6d; /* Цвет кофе с молоком при наведении */
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
         }
-
-        /* Элегантная Hero-секция (Баннер) */
+        nav .user-greeting {
+            color: white;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        nav .admin-link {
+            background: #2e7d32;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        nav .admin-link:hover {
+            background: #1b5e20;
+            transform: scale(1.05);
+        }
         .hero {
             text-align: center;
-            padding: 60px 20px;
-            background-color: #f7f0e3;
-            border-radius: 12px;
+            padding: 70px 30px;
+            background: linear-gradient(135deg, #ffffff, #fdf0e0);
+            border-radius: 20px;
             margin: 30px 0;
-            border: 1px solid #ede3d0;
+            border: 2px solid #f57c00;
+            box-shadow: 0 8px 30px rgba(245, 124, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '🚗';
+            position: absolute;
+            top: -30px;
+            right: -20px;
+            font-size: 150px;
+            opacity: 0.08;
+            transform: rotate(-10deg);
+        }
+        .hero::after {
+            content: '🚗';
+            position: absolute;
+            bottom: -30px;
+            left: -20px;
+            font-size: 120px;
+            opacity: 0.06;
+            transform: rotate(20deg);
         }
         .hero h1 {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 700;
             margin-bottom: 15px;
-            color: #3d3126;
+            color: #e65100;
+            position: relative;
+        }
+        .hero h1 .emoji {
+            font-size: 2.8rem;
         }
         .hero p {
-            font-size: 1.1rem;
-            color: #7a6a58;
-            margin-bottom: 25px;
+            font-size: 1.2rem;
+            color: #6b5b4b;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .hero .highlight {
+            color: #2e7d32;
+            font-weight: 700;
         }
         .btn-catalog {
-            background-color: #8c6d53;
-            color: #fff;
-            padding: 12px 30px;
+            background: linear-gradient(135deg, #f57c00, #e65100);
+            color: white;
+            padding: 16px 40px;
             text-decoration: none;
-            font-weight: 600;
-            border-radius: 8px;
-            transition: background 0.3s ease;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            transition: all 0.3s ease;
             display: inline-block;
+            box-shadow: 0 4px 20px rgba(245, 124, 0, 0.4);
+            position: relative;
         }
         .btn-catalog:hover {
-            background-color: #735943;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(245, 124, 0, 0.5);
+        }
+        .btn-catalog::after {
+            content: ' 🚗';
         }
         h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-top: 50px;
+            margin-bottom: 25px;
+            color: #2e7d32;
+            border-bottom: 3px solid #f57c00;
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        h2 .emoji {
             font-size: 1.8rem;
-            font-weight: 600;
-            margin-top: 40px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #f0e6d2;
-            padding-bottom: 10px;
         }
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
+            gap: 30px;
         }
         .product-card {
-            background: #fff;
-            border: 1px solid #efeae0;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(140, 109, 83, 0.03);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: white;
+            border: 2px solid #f5f0eb;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+        .product-card::before {
+            content: '🚗';
+            position: absolute;
+            top: -15px;
+            right: -10px;
+            font-size: 60px;
+            opacity: 0.05;
         }
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(140, 109, 83, 0.08);
+            transform: translateY(-8px);
+            border-color: #f57c00;
+            box-shadow: 0 12px 35px rgba(245, 124, 0, 0.15);
         }
         .product-card h3 {
             margin: 0 0 10px 0;
             font-size: 1.3rem;
-            color: #3d3126;
+            color: #e65100;
         }
         .product-price {
             font-weight: 700;
-            color: #8c6d53;
-            font-size: 1.2rem;
+            color: #2e7d32;
+            font-size: 1.4rem;
             margin-bottom: 15px;
         }
-        .btn-detail {
-            color: #8c6d53;
+        .product-price span {
+            font-size: 0.9rem;
+            color: #888;
+        }
+        .product-card .btn-detail {
+            color: #f57c00;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
-        .btn-detail:hover {
-            text-decoration: underline;
+        .product-card .btn-detail:hover {
+            color: #e65100;
+            transform: translateX(5px);
         }
+        .product-stock {
+            font-size: 0.8rem;
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        .product-stock.out {
+            color: #d32f2f;
+        }
+
         .category-list {
             display: flex;
             flex-wrap: wrap;
@@ -139,80 +242,181 @@
             list-style: none;
         }
         .category-item a {
-            display: block;
-            background-color: #fff;
-            border: 1px solid #efeae0;
-            padding: 10px 20px;
-            border-radius: 20px;
-            color: #6b5b4b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            border: 2px solid #f5f0eb;
+            padding: 12px 25px;
+            border-radius: 50px;
+            color: #4a3f35;
             text-decoration: none;
             font-weight: 500;
             transition: all 0.3s ease;
+            font-size: 0.95rem;
         }
         .category-item a:hover {
-            background-color: #8c6d53;
-            color: #fff;
-            border-color: #8c6d53;
+            background: #f57c00;
+            color: white;
+            border-color: #f57c00;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(245, 124, 0, 0.3);
+        }
+        .category-item a .cat-emoji {
+            font-size: 1.2rem;
+        }
+
+        .footer {
+            margin-top: 60px;
+            padding: 30px 0;
+            border-top: 2px solid #f5f0eb;
+            text-align: center;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        .footer .heart {
+            color: #d32f2f;
+        }
+        .footer .brand {
+            color: #f57c00;
+            font-weight: 600;
+        }
+        @media (max-width: 768px) {
+            nav ul {
+                gap: 12px;
+                padding: 0 10px;
+            }
+            nav a {
+                font-size: 0.85rem;
+                padding: 6px 12px;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .hero {
+                padding: 40px 20px;
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 20px;
+            }
+        }
+        @media (max-width: 480px) {
+            nav ul {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .hero h1 {
+                font-size: 1.6rem;
+            }
+            .hero p {
+                font-size: 1rem;
+            }
+            .btn-catalog {
+                padding: 14px 30px;
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <nav>
         <ul>
-             <li><a href="{% url 'catalog:index' %}">Главная</a></li>
-        <li><a href="{% url 'catalog:product_list' %}">Каталог</a></li>
-        
-        {% if user.is_authenticated %}
-         <li><a href="/admin/" target="_blank" style="font-weight: 600; color: #8c6d53;">Панель администратора</a></li>
-            <li><strong>Привет, {{ user.username }}!</strong></li>
-            <li><a href="{% url 'catalog:logout' %}">Выйти</a></li>
-        {% else %}
-            <li><a href="{% url 'catalog:login' %}">Войти</a></li>
-            <li><a href="{% url 'catalog:register' %}">Регистрация</a></li>
-        {% endif %}
-        <li><a href="{% url 'catalog:profile' %}">Личный кабинет</a></li>
-
+            <li><a href="{% url 'catalog:index' %}">🏠 Главная</a></li>
+            <li><a href="{% url 'catalog:product_list' %}">📦 Каталог</a></li>
+            <li><a href="{% url 'catalog:cart_view' %}">🛒 Корзина</a></li>
+            
+            {% if user.is_authenticated %}
+                <li><a href="/admin/" class="admin-link">🔧 Панель админа</a></li>
+                <li class="user-greeting">👋 Привет, {{ user.username }}!</li>
+                <li><a href="{% url 'catalog:logout' %}">🚪 Выйти</a></li>
+            {% else %}
+                <li><a href="{% url 'catalog:login' %}">🔑 Войти</a></li>
+                <li><a href="{% url 'catalog:register' %}">📝 Регистрация</a></li>
+            {% endif %}
+            <li><a href="{% url 'catalog:profile' %}">👤 Профиль</a></li>
         </ul>
     </nav>
 
     <div class="container">
         <section class="hero">
-            <h1>Добро пожаловать в ArtShop!</h1>
-            <p>Качественные худжественные товары по доступным ценам.</p>
+            <h1>
+                <span class="emoji">🚗</span>
+                Добро пожаловать в <span style="color: #2e7d32;">ArtShop</span>!
+                <span class="emoji">🚗</span>
+            </h1>
+            <p>
+                🎨 Качественные <span class="highlight">художественные товары</span> 
+                по доступным ценам с <span class="highlight">быстрой доставкой</span> 🚀
+            </p>
             <a href="{% url 'catalog:product_list' %}" class="btn-catalog">Перейти в каталог</a>
         </section>
 
-    
         <section>
-            <h2>Популярные товары</h2>
+            <h2>
+                <span class="emoji">⭐</span>
+                Популярные товары
+                <span class="emoji">⭐</span>
+            </h2>
             <div class="product-grid">
                 {% for product in popular_products %}
                     <div class="product-card">
                         <div>
                             <h3>{{ product.name }}</h3>
-                            <div class="product-price">{{ product.price }} руб.</div>
+                            <div class="product-price">
+                                {{ product.price }} <span>BYN</span>
+                            </div>
+                            <div class="product-stock {% if product.stock == 0 %}out{% endif %}">
+                                {% if product.stock > 0 %}
+                                    ✅ В наличии ({{ product.stock }} шт.)
+                                {% else %}
+                                    ❌ Нет в наличии
+                                {% endif %}
+                            </div>
                         </div>
-                        <a href="{% url 'catalog:product_detail' product.pk %}" class="btn-detail">Подробнее →</a>
+                        <a href="{% url 'catalog:product_detail' product.pk %}" class="btn-detail">
+                            Подробнее →
+                        </a>
                     </div>
                 {% empty %}
-                    <p>Товары пока не добавлены.</p>
+                    <p style="color: #999; font-size: 1.1rem; grid-column: 1/-1; text-align: center; padding: 40px;">
+                        🚗 Товары пока не добавлены
+                    </p>
                 {% endfor %}
             </div>
         </section>
 
         <section style="margin-top: 40px; margin-bottom: 60px;">
-            <h2>Категории товаров</h2>
+            <h2>
+                <span class="emoji">📂</span>
+                Категории товаров
+                <span class="emoji">📂</span>
+            </h2>
             <ul class="category-list">
                 {% for category in categories %}
                     <li class="category-item">
-                        <a href="{% url 'catalog:product_list' %}?category={{ category.id }}">{{ category.name }}</a>
+                        <a href="{% url 'catalog:product_list' %}?category={{ category.id }}">
+                            <span class="cat-emoji">🚗</span>
+                            {{ category.name }}
+                        </a>
                     </li>
                 {% empty %}
-                    <li>Категории не найдены.</li>
+                    <li style="color: #999; font-size: 1.1rem;">Категории не найдены</li>
                 {% endfor %}
             </ul>
         </section>
     </div>
 
+    <div class="footer">
+        <p>
+            🚗 ArtShop &copy; 2026 — 
+            Сделано с <span class="heart">❤️</span> для автолюбителей и художников
+            <br>
+            <span class="brand">#ДоставкаМашинкой</span>
+        </p>
+    </div>
 </body>
 </html>

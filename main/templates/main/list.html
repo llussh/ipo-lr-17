@@ -4,146 +4,503 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Каталог товаров (API)</title>
+    <title>Каталог товаров</title>
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: #fdfbf7;
+            background: #fff4e6;
             color: #4a3f35;
             margin: 0;
             padding: 0;
             position: relative;
             overflow-x: hidden;
+            min-height: 100vh;
         }
-        #cat-container {
+
+        #car-container {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
         }
-        .floating-cat {
-            position: absolute; font-size: 24px; user-select: none;
-            animation: fall linear infinite; opacity: 0.6;
+        .floating-car {
+            position: absolute;
+            font-size: 24px;
+            user-select: none;
+            animation: fall linear infinite;
+            opacity: 0.5;
         }
         @keyframes fall {
-            0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.6; }
-            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+            0% {
+                transform: translateY(-50px) rotate(0deg) scale(0.5);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(105vh) rotate(720deg) scale(1.2);
+                opacity: 0;
+            }
         }
+
         nav {
-            background-color: #f4efe6; padding: 15px 0; border-bottom: 1px solid #e9dfce;
+            background: linear-gradient(135deg, #f57c00, #e65100);
+            padding: 18px 0;
+            border-bottom: 4px solid #2e7d32;
+            box-shadow: 0 4px 15px rgba(245, 124, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
         nav ul {
-            list-style: none; margin: 0; padding: 0; display: flex; gap: 25px; justify-content: center;
+            list-style: none;
+            margin: 0;
+            padding: 0 20px;
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
         }
-        nav a { color: #6b5b4b; text-decoration: none; font-weight: 500; }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+        nav a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        nav .user-greeting {
+            color: white;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
         .container {
-            max-width: 1200px; margin: 0 auto; padding: 30px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
         }
-        
-    
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #e65100;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        h2 .emoji {
+            font-size: 2rem;
+        }
+        .filter-info {
+            color: #2e7d32;
+            font-weight: 600;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 2px solid #f57c00;
+        }
+
+        .filters {
+            background: white;
+            padding: 20px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border: 2px solid #f5f0eb;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+        .filters label {
+            font-weight: 600;
+            color: #4a3f35;
+        }
+        .filters select,
+        .filters input {
+            padding: 10px 15px;
+            border: 2px solid #ede3d0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            background: white;
+            transition: border-color 0.3s;
+            min-width: 150px;
+        }
+        .filters select:focus,
+        .filters input:focus {
+            border-color: #f57c00;
+            outline: none;
+        }
+        .filters .btn-filter {
+            background: #f57c00;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filters .btn-filter:hover {
+            background: #e65100;
+            transform: scale(1.02);
+        }
+        .filters .btn-reset {
+            background: transparent;
+            color: #888;
+            border: 2px solid #ede3d0;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filters .btn-reset:hover {
+            border-color: #f57c00;
+            color: #f57c00;
+        }
+
         .product-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 25px;
+            margin-top: 10px;
         }
+
+
         .product-card {
-            background: #fff; border: 1px solid #efeae0; border-radius: 12px; padding: 15px;
-            display: flex; flex-direction: column; justify-content: space-between;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.01);
+            background: white;
+            border: 2px solid #f5f0eb;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .product-img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; }
-        .product-card h4 { margin: 0 0 10px 0; font-size: 1.1rem; color: #3d3126; }
-        .product-price { font-weight: 700; color: #8c6d53; }
-        
-        .btn-detail, .btn-submit {
-            display: block; text-align: center; border-radius: 8px; font-weight: 500; font-size: 0.9rem; font-family: inherit;
+        .product-card::before {
+            content: '🚗';
+            position: absolute;
+            top: -15px;
+            right: -10px;
+            font-size: 60px;
+            opacity: 0.05;
         }
-        .btn-detail { background-color: #f4efe6; color: #6b5b4b; text-decoration: none; padding: 10px; }
-        .btn-submit { background-color: #8c6d53; color: #fff; border: none; padding: 12px; cursor: pointer; width: 100%; }
-        .btn-submit:disabled { background-color: #dcd6cd; color: #a89f91; cursor: not-allowed; }
+        .product-card:hover {
+            transform: translateY(-8px);
+            border-color: #f57c00;
+            box-shadow: 0 12px 35px rgba(245, 124, 0, 0.15);
+        }
+        .product-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            background: #f8f5f0;
+        }
+        .product-card h4 {
+            margin: 0 0 10px 0;
+            font-size: 1.15rem;
+            color: #e65100;
+            font-weight: 600;
+        }
+        .product-card .product-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .product-price {
+            font-weight: 700;
+            color: #2e7d32;
+            font-size: 1.4rem;
+        }
+        .product-price span {
+            font-size: 0.9rem;
+        }
+        .product-stock {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .product-stock.out {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+        .product-card .btn-detail {
+            display: block;
+            text-align: center;
+            background: #f57c00;
+            color: white;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+        .product-card .btn-detail:hover {
+            background: #e65100;
+            transform: scale(1.02);
+        }
 
         .spinner {
-            width: 50px; height: 50px;
-            border: 5px solid #f4efe6; border-top: 5px solid #8c6d53;
-            border-radius: 50%; animation: spin 1s linear infinite;
-            margin: 40px auto; display: none;
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f5f0eb;
+            border-top: 5px solid #f57c00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 60px auto;
+            display: none;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
         .error-alert {
-            background-color: #fcedeb; color: #c45a4a;
-            border: 1px solid #f5d2cd; padding: 15px;
-            border-radius: 8px; display: none; text-align: center; margin-top: 20px;
+            background: #ffebee;
+            color: #c62828;
+            border: 2px solid #ef9a9a;
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: 500;
         }
 
         .toast-notification {
-            position: fixed; bottom: 20px; right: 20px;
-            color: white; padding: 15px 25px; border-radius: 8px;
-            font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transform: translateY(100px); opacity: 0;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #2e7d32, #1b5e20);
+            color: white;
+            padding: 18px 30px;
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 8px 30px rgba(46, 125, 50, 0.4);
+            transform: translateY(120px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        .toast-notification.show { transform: translateY(0); opacity: 1; }
+        .toast-notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast-notification .toast-icon {
+            font-size: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            nav ul {
+                gap: 12px;
+                padding: 0 10px;
+            }
+            nav a {
+                font-size: 0.85rem;
+                padding: 6px 12px;
+            }
+            h2 {
+                font-size: 1.6rem;
+            }
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filters select,
+            .filters input {
+                min-width: 100%;
+            }
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 15px;
+            }
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        @media (max-width: 480px) {
+            nav ul {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+            .toast-notification {
+                left: 20px;
+                right: 20px;
+                bottom: 20px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div id="cat-container"></div>
-    
-    <div id="toast-notification" class="toast-notification">Товар добавлен!</div>
+    <div id="car-container"></div>
 
-     <nav>
+    <div id="toast-notification" class="toast-notification">
+        <span class="toast-icon">🚗</span>
+        <span id="toast-message">Товар добавлен в корзину!</span>
+    </div>
+
+    <nav>
         <ul>
-            <li><a href="{% url 'catalog:index' %}">Главная</a></li>
-            <li><a href="{% url 'catalog:product_list' %}">Каталог</a></li>
-            
-            {% if user.is_authenticated %}
-                <li><strong>Привет, {{ user.username }}!</strong></li>
-                <li><a href="{% url 'catalog:logout' %}">Выйти</a></li>
-            {% else %}
-                <li><a href="{% url 'catalog:login' %}">Войти</a></li>
-                <li><a href="{% url 'catalog:register' %}">Регистрация</a></li>
-            {% endif %}
-            <li><a href="{% url 'catalog:profile' %}">Личный кабинет</a></li>
+            <li><a href="{% url 'catalog:index' %}">🏠 Главная</a></li>
+            <li><a href="{% url 'catalog:product_list' %}">📦 Каталог</a></li>
+            <li><a href="{% url 'catalog:cart_view' %}">🛒 Корзина</a></li>
 
+            {% if user.is_authenticated %}
+                <li class="user-greeting">👋 Привет, {{ user.username }}!</li>
+                <li><a href="{% url 'catalog:logout' %}">🚪 Выйти</a></li>
+            {% else %}
+                <li><a href="{% url 'catalog:login' %}">🔑 Войти</a></li>
+                <li><a href="{% url 'catalog:register' %}">📝 Регистрация</a></li>
+            {% endif %}
+            <li><a href="{% url 'catalog:profile' %}">👤 Профиль</a></li>
         </ul>
     </nav>
 
-
     <div class="container">
-        <h2>Каталог товаров</h2>
+   
+        <div class="page-header">
+            <h2>
+                <span class="emoji">🚗</span>
+                Каталог товаров
+                <span class="emoji">🚗</span>
+            </h2>
+            <span class="filter-info">⭐ Все товары</span>
+        </div>
+
+
+        <div class="filters">
+            <label for="category-filter">Категория:</label>
+            <select id="category-filter">
+                <option value="">Все категории</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="sort-filter">Сортировка:</label>
+            <select id="sort-filter">
+                <option value="name">По названию</option>
+                <option value="price_asc">Цена: по возрастанию</option>
+                <option value="price_desc">Цена: по убыванию</option>
+                <option value="popular">По популярности</option>
+            </select>
+
+            <label for="search-input">Поиск:</label>
+            <input type="text" id="search-input" placeholder="Найти товар..." style="min-width: 200px;">
+
+            <button class="btn-filter" id="apply-filters">🔍 Применить</button>
+            <button class="btn-reset" id="reset-filters">↺ Сбросить</button>
+        </div>
+
 
         <div id="loading-spinner" class="spinner"></div>
 
+
         <div id="error-message" class="error-alert"></div>
+
 
         <div id="api-product-grid" class="product-grid"></div>
     </div>
 
     <script src="{% static 'js/main.js' %}?v=99"></script>
 
-
     <script>
-        const catContainer = document.getElementById('cat-container');
-        const catEmojis = ['🐱', '🐈', '🐾', '😸', '😻', '🐈‍⬛'];
-        function createCat() {
-            const cat = document.createElement('div');
-            cat.classList.add('floating-cat');
-            cat.innerText = catEmojis[Math.floor(Math.random() * catEmojis.length)];
-            cat.style.left = Math.random() * 100 + 'vw';
+
+        const carContainer = document.getElementById('car-container');
+        const carEmojis = ['🚗', '🚕', '🚙', '🚘', '🚖', '🏎️'];
+
+        function createCar() {
+            const car = document.createElement('div');
+            car.classList.add('floating-car');
+            car.innerText = carEmojis[Math.floor(Math.random() * carEmojis.length)];
+            car.style.left = Math.random() * 100 + 'vw';
             const duration = Math.random() * 4 + 5;
-            cat.style.animationDuration = duration + 's';
-            cat.style.fontSize = Math.random() * 12 + 20 + 'px';
-            catContainer.appendChild(cat);
-            setTimeout(() => { cat.remove(); }, duration * 1000);
+            car.style.animationDuration = duration + 's';
+            car.style.fontSize = Math.random() * 16 + 20 + 'px';
+            carContainer.appendChild(car);
+            setTimeout(() => {
+                car.remove();
+            }, duration * 1000);
         }
-        setInterval(createCat, 700);
+        setInterval(createCar, 700);
+
+
+        function showToast(message) {
+            const toast = document.getElementById('toast-notification');
+            const toastMessage = document.getElementById('toast-message');
+            toastMessage.textContent = message || 'Товар добавлен в корзину!';
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+
+        document.getElementById('apply-filters').addEventListener('click', function() {
+            const category = document.getElementById('category-filter').value;
+            const sort = document.getElementById('sort-filter').value;
+            const search = document.getElementById('search-input').value;
+
+            showToast('🔍 Фильтры применены!');
+        });
+
+        document.getElementById('reset-filters').addEventListener('click', function() {
+            document.getElementById('category-filter').value = '';
+            document.getElementById('sort-filter').value = 'name';
+            document.getElementById('search-input').value = '';
+            showToast('↺ Фильтры сброшены');
+        });
     </script>
 </body>
 </html>
