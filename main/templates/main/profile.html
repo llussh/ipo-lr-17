@@ -25,7 +25,6 @@
             min-height: 100vh;
         }
 
-
         #car-container {
             position: fixed;
             top: 0;
@@ -56,7 +55,6 @@
             }
         }
 
-    
         nav {
             background: linear-gradient(135deg, #f57c00, #e65100);
             padding: 18px 0;
@@ -97,7 +95,6 @@
             z-index: 10;
         }
 
-      
         .page-header {
             display: flex;
             justify-content: space-between;
@@ -165,7 +162,6 @@
             transform: translateY(-2px);
         }
 
-     
         .unauthorized-box {
             text-align: center;
             padding: 60px 30px;
@@ -207,7 +203,6 @@
             box-shadow: 0 8px 30px rgba(245, 124, 0, 0.4);
         }
 
-      
         .flex-container {
             display: flex;
             gap: 30px;
@@ -237,7 +232,6 @@
             gap: 10px;
         }
 
-    
         .role-badge {
             display: inline-block;
             padding: 6px 18px;
@@ -258,7 +252,6 @@
             color: #2e7d32;
         }
 
-   
         .form-group {
             margin-bottom: 18px;
         }
@@ -316,7 +309,6 @@
             box-shadow: 0 8px 25px rgba(46, 125, 50, 0.4);
         }
 
-      
         .orders-table-wrapper {
             overflow-x: auto;
         }
@@ -400,7 +392,6 @@
             margin-bottom: 10px;
         }
 
-    
         #toast {
             position: fixed;
             bottom: 30px;
@@ -430,7 +421,6 @@
             background: linear-gradient(135deg, #c62828, #b71c1c);
         }
 
-     
         @media (max-width: 768px) {
             nav ul {
                 gap: 12px;
@@ -488,13 +478,9 @@
 </head>
 <body>
 
-
     <div id="car-container"></div>
-
-   
     <div id="toast"></div>
 
-   
     <nav>
         <ul>
             <li><a href="{% url 'catalog:index' %}">🏠 Главная</a></li>
@@ -513,7 +499,6 @@
                 <a href="{% url 'catalog:login' %}" class="btn-login">🔑 Войти в аккаунт</a>
             </div>
         {% else %}
-         
             <div class="page-header">
                 <h1>
                     <span class="emoji">🚗</span>
@@ -527,7 +512,6 @@
             </div>
 
             <div class="flex-container">
-            
                 <section class="block-section">
                     <h2>👤 Мой профиль</h2>
                     <p style="margin-bottom: 15px;">
@@ -559,7 +543,6 @@
                     </form>
                 </section>
 
-                
                 <section class="block-section">
                     <h2>📋 Мои заказы</h2>
                     <div id="orders-wrapper">
@@ -614,7 +597,6 @@
                 return cookieValue;
             }
 
-        
             try {
                 const res = await fetch('/api/me/');
                 if (res.ok) {
@@ -639,7 +621,6 @@
                 console.error(err);
             }
 
-          
             document.getElementById('profile-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const payload = {
@@ -669,9 +650,12 @@
                 }
             });
 
-       
             const tbody = document.getElementById('orders-tbody');
             const noOrders = document.getElementById('no-orders');
+
+            function getOrderDetailUrl(orderId) {
+                return '/order/' + orderId + '/';
+            }
 
             try {
                 const res = await fetch('/api/orders/');
@@ -695,8 +679,8 @@
                                 <td><strong>#${order.id}</strong></td>
                                 <td>${date}</td>
                                 <td><span class="status-badge ${statusClass}">${statusMap[order.status] || order.status || 'В обработке'}</span></td>
-                                <td><strong style="color: #2e7d32;">${order.total || 0} ₽</strong></td>
-                                <td><a href="/catalog/order/${order.id}/" class="btn-order-detail">Подробнее</a></td>
+                                <td><strong style="color: #2e7d32;">${order.total_price || 0} BYN</strong></td>
+                                <td><a href="${getOrderDetailUrl(order.id)}" class="btn-order-detail">Подробнее</a></td>
                             `;
                             tbody.appendChild(tr);
                         });
@@ -706,7 +690,6 @@
                 console.error(err);
             }
 
-      
             const carContainer = document.getElementById('car-container');
             const carEmojis = ['🚗', '🚕', '🚙', '🚘', '🚖', '🏎️'];
 

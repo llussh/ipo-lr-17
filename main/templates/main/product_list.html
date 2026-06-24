@@ -25,8 +25,6 @@
             position: relative;
             overflow-x: hidden;
         }
-
-        /* Падающие машинки */
         #car-container {
             position: fixed;
             top: 0;
@@ -57,7 +55,6 @@
             }
         }
 
-        /* Навигация */
         nav {
             background: linear-gradient(135deg, #f57c00, #e65100);
             padding: 18px 0;
@@ -413,10 +410,9 @@
 </head>
 <body>
 
-    <!-- Контейнер для падающих машинок -->
+
     <div id="car-container"></div>
 
-    <!-- Навигация -->
     <nav>
         <ul>
             <li><a href="{% url 'catalog:index' %}">🏠 Главная</a></li>
@@ -433,7 +429,7 @@
     </nav>
 
     <div class="container">
-        <!-- Заголовок -->
+
         <div class="page-header">
             <h1>
                 <span class="emoji">🚗</span>
@@ -444,7 +440,7 @@
             {% endif %}
         </div>
 
-        <!-- Форма поиска и фильтров -->
+
         <form method="get" action="{% url 'catalog:product_list' %}" class="search-form">
             <div class="form-group">
                 <label for="q">🔍 Поиск по названию</label>
@@ -464,7 +460,6 @@
             </div>
         </form>
 
-        <!-- Сетка товаров -->
         <div class="product-grid">
             {% for product in products %}
                 <div class="product-card">

@@ -298,7 +298,7 @@
         <div class="product-header">
             <h1>🚗 {{ product.name }}</h1>
             <div class="price-badge">
-                {{ product.price }} <span>₽</span>
+                {{ product.price }} <span>BYN</span>
             </div>
         </div>
 
@@ -329,14 +329,14 @@
         </div>
 
         <div class="description">
-            <h3>📝 Описание</h3>
+            <h3> Описание</h3>
             <p>{{ product.description }}</p>
         </div>
 
    
         {% if product.specifications %}
         <div class="specs">
-            <h3>🔧 Характеристики</h3>
+            <h3> Характеристики</h3>
             <div class="specs-grid">
                 {% for key, value in product.specifications.items %}
                 <div class="spec-item">
@@ -352,11 +352,11 @@
             <form method="post" action="{% url 'catalog:add_to_cart' product.id %}" style="display:inline;">
                 {% csrf_token %}
                 <input type="hidden" name="quantity" value="1">
-                <button type="submit" class="btn btn-primary">🛒 Добавить в корзину</button>
+                <button type="submit" class="btn btn-primary"> Добавить в корзину</button>
             </form>
             <a href="{% url 'catalog:product_list' %}" class="btn btn-outline">← Назад к каталогу</a>
             {% if user.is_authenticated %}
-            <a href="{% url 'catalog:add_to_wishlist' product.id %}" class="btn btn-secondary">❤️ В избранное</a>
+            <a href="{% url 'catalog:add_to_wishlist' product.id %}" class="btn btn-secondary"> В избранное</a>
             {% endif %}
         </div>
     </div>

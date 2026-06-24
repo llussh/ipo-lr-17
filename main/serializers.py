@@ -42,7 +42,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = '__all__'
+        fields = ['id', 'user', 'total_price', 'status', 'address', 'phone', 'comment', 'created_at']
 class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
     email = serializers.CharField(source='user.email', required=False) 

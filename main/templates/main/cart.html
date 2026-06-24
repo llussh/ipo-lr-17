@@ -234,7 +234,7 @@
                                 <button type="submit" class="btn btn-update">Обновить</button>
                             </form>
                         </td>
-                        <td class="price">{{ item.product.price }} ₽</td>
+                        <td class="price">{{ item.product.price }} BYN</td>
                         <td class="price">{% widthratio item.product.price 1 item.quantity %} BYN</td>
                         <td>
                             <form method="post" action="{% url 'catalog:remove_from_cart' item.id %}" style="display:inline;">
@@ -259,7 +259,7 @@
 
         <h2>
             🛒 Общая стоимость: 
-            <span class="total-price">{{ total_cost }} ₽</span>
+            <span class="total-price">{{ total_cost }} BYN</span>
         </h2>
         
         <div class="actions">

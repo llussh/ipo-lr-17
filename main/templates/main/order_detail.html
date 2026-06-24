@@ -1,0 +1,16 @@
+{% extends 'main/base.html' %}
+{% block content %}
+<h1>📋 Заказ №{{ order.id }}</h1>
+<div class="order-info">
+    <p><strong>Дата:</strong> {{ order.created_at }}</p>
+    <p><strong>Статус:</strong> {{ order.status }}</p>
+    <p><strong>Сумма:</strong> {{ order.total_price }} ₽</p>
+</div>
+<h2>Товары:</h2>
+<ul>
+    {% for item in order.items.all %}
+        <li>{{ item.product.name }} x {{ item.quantity }} = {{ item.price }} ₽</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'catalog:profile' %}" class="btn">← Назад к заказам</a>
+{% endblock %}

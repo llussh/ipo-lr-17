@@ -124,17 +124,21 @@ def checkout(request):
     total = sum(item.quantity * item.product.price for item in cart_items)
     
     if not cart_items:
-        return redirect('main:cart_view')
+        return redirect('catalog:cart_view')
     
     if request.method == 'POST':
         address = request.POST.get('address')
         phone = request.POST.get('phone')
         comment = request.POST.get('comment')
 
+
         order = Order.objects.create(
             user=request.user,
-            total_price=total,
-            status='pending'
+            total_price=total, 
+            status='pending',
+            address=address,
+            phone=phone,
+            comment=comment
         )
 
         for item in cart_items:
@@ -145,16 +149,16 @@ def checkout(request):
                 quantity=item.quantity,
                 price=item.product.price
             )
+        
         send_receipt_email(request.user.email, order, cart_items, total)
         cart_items.delete()
         
-        return redirect('main:order_success')
+        return redirect('catalog:order_success')
     
     return render(request, 'main/checkout.html', {
         'cart_items': cart_items,
         'total': total
     })
-
 def generate_receipt(order, cart_items, total):
     """Простой Excel чек"""
     wb = openpyxl.Workbook()
@@ -212,7 +216,12 @@ def send_receipt_email(recipient_email, order, excel_file):
     email.send()
 
 def order_success(request):
-    return render(request, 'main/order_success.html')
+    try:
+        order = Order.objects.filter(user=request.user).latest('created_at')
+    except Order.DoesNotExist:
+        order = None
+    
+    return render(request, 'main/order_success.html', {'order': order})
 
 def send_receipt_email(recipient_email, order, cart_items, total):
     """Отправка чека на email с использованием send_mail"""
@@ -330,3 +339,11 @@ def settings_view(request):
     return render(request, 'main/settings.html')
 def test(request):
     return render(request, 'test.html')
+@login_required
+def add_to_wishlist(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    return redirect('catalog:product_detail', pk=product_id)
+@login_required
+def order_detail(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    return render(request, 'main/order_detail.html', {'order': order})

@@ -20,7 +20,9 @@ from .views import (
     login_view,
     logout_view,
     profile_view,
-    settings_view
+    settings_view,
+    add_to_wishlist,
+    order_detail,
     
 )
 from .views import me_view, OrderViewSet
@@ -51,6 +53,9 @@ urlpatterns = [
     path('profile/', profile_view, name='profile'),
     path('settings/', settings_view, name='settings'),
     path('test/', views.test, name='test'),
+    path('wishlist/add/<int:product_id>/', views.add_to_wishlist, name='add_to_wishlist'),
+    path('order/<int:order_id>/', views.order_detail, name='order_detail'),
+
 
 ]
 
